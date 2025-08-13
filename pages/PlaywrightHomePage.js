@@ -12,6 +12,9 @@ export class PlaywrightHomePage {
 		await this.page.goto('/');
 	}
 
+	/**
+	 * @param {import('@playwright/test').Expect} expect
+	 */
 	async assertTitleContainsPlaywright(expect) {
 		await expect(this.page).toHaveTitle(/Playwright/);
 	}
