@@ -76,41 +76,45 @@ npm run codegen
 
 ### Estructura del proyecto
 ```
-playwright.config.js          # Configuración de Playwright (baseURL, proyectos/browsers, reporter)
+playwright.config.ts          # Configuración de Playwright (baseURL, proyectos/browsers, reporter)
 pages/
-  PlaywrightHomePage.js       # Page Object de la home de playwright.dev
+  PlaywrightHomePage.ts       # Page Object de la home de playwright.dev
 tests/
-  example.spec.js             # Pruebas que usan el Page Object
+  example.spec.ts             # Pruebas que usan el Page Object
 ```
 
 ### Metodología Page Object Model (POM)
 Los Page Objects encapsulan selectores y acciones, manteniendo los specs limpios y orientados a comportamiento.
 
-Ejemplo de Page Object (fragmento de `pages/PlaywrightHomePage.js`):
-```js
+Ejemplo de Page Object (fragmento de `pages/PlaywrightHomePage.ts`):
+```ts
+import { expect, type Page } from '@playwright/test';
+
 export class PlaywrightHomePage {
-  constructor(page) {
-    this.page = page;
-  }
+  constructor(private readonly page: Page) {}
+
   async goto() {
     await this.page.goto('/');
   }
-  async assertTitleContainsPlaywright(expect) {
+
+  async assertTitleContainsPlaywright() {
     await expect(this.page).toHaveTitle(/Playwright/);
   }
+
   async clickGetStarted() {
     await this.page.getByRole('link', { name: 'Get started' }).click();
   }
+
   installationHeading() {
     return this.page.getByRole('heading', { name: 'Installation' });
   }
 }
 ```
 
-Uso en un test (fragmento de `tests/example.spec.js`):
-```js
+Uso en un test (fragmento de `tests/example.spec.ts`):
+```ts
 import { test, expect } from '@playwright/test';
-import { PlaywrightHomePage } from '../pages/PlaywrightHomePage.js';
+import { PlaywrightHomePage } from '../pages/PlaywrightHomePage';
 
 test('get started link', async ({ page }) => {
   const home = new PlaywrightHomePage(page);
@@ -121,9 +125,30 @@ test('get started link', async ({ page }) => {
 ```
 
 ### Configuración
-- `baseURL`: definido en `playwright.config.js` como `https://playwright.dev/`. Ajusta este valor si tus tests apuntan a otra aplicación.
+- `baseURL`: definido en `playwright.config.ts` y puede venir de `BASE_URL` en `.env` (fallback `https://playwright.dev/`).
 - Proyectos: configurados para `chromium`, `firefox` y `webkit` en desktop.
 - Reporter: `html` por defecto.
+
+### Artefactos (screenshots, video, trace)
+Por defecto:
+- Screenshots: `only-on-failure`
+- Video: `retain-on-failure`
+- Trace: `retain-on-failure` en CI, `on-first-retry` en local
+
+Forzar artefactos por CLI (ejemplos):
+```bash
+# Forzar trace en todas las ejecuciones
+npx playwright test --trace=on
+
+# Forzar video y screenshots
+npx playwright test --video=on --screenshot=on
+
+# Abrir el reporte HTML (contiene enlaces a traces/videos)
+npx playwright show-report
+
+# Abrir un trace específico
+npx playwright show-trace path/a/trace.zip
+```
 
 ### Convenciones recomendadas
 - Ubicar Page Objects en `pages/` con nombre `XxxPage.js`.
