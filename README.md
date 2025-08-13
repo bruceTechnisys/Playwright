@@ -156,6 +156,23 @@ npx playwright show-report
 npx playwright show-trace path/a/trace.zip
 ```
 
+### Etiquetas y filtrado (grep)
+- Etiqueta tests en el título con `@smoke`, `@regression`, etc.: por ejemplo `test('login @smoke', ...)` o `test.describe('Checkout @regression', ...)`.
+- Ejecuta subconjuntos con `--grep`:
+```bash
+# Solo smoke
+npm test -- --grep=@smoke
+
+# Solo regression
+npm test -- --grep=@regression
+
+# Excluir regression (invertir filtro)
+npm test -- --grep=@regression --grep-invert
+
+# Combinar (regex): smoke o critical
+npm test -- --grep="@smoke|@critical"
+```
+
 ### Convenciones recomendadas
 - Ubicar Page Objects en `pages/` con nombre `XxxPage.js`.
 - Mantener selectores dentro de los Page Objects; evitar usarlos directamente en los specs.
