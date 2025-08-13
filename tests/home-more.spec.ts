@@ -1,6 +1,6 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-import { PlaywrightHomePage } from '../pages/PlaywrightHomePage.js';
+import { PlaywrightHomePage } from '../pages/PlaywrightHomePage';
 
 test.describe('Home extra tests', () => {
   test('Get started navigates to docs intro', async ({ page }) => {

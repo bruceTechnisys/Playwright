@@ -14,9 +14,12 @@
   },
   "include": [
     "pages/**/*.js",
+    "pages/**/*.ts",
     "tests/**/*.js",
+    "tests/**/*.ts",
     "tests-examples/**/*.js",
-    "playwright.config.js"
+    "playwright.config.js",
+    "playwright.config.ts"
   ]
 }
 

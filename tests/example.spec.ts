@@ -1,11 +1,11 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-import { PlaywrightHomePage } from '../pages/PlaywrightHomePage.js';
+import { PlaywrightHomePage } from '../pages/PlaywrightHomePage';
 
 test('has title', async ({ page }) => {
   const home = new PlaywrightHomePage(page);
   await home.goto();
-  await home.assertTitleContainsPlaywright(expect);
+  await home.assertTitleContainsPlaywright();
 });
 
 test('get started link', async ({ page }) => {
@@ -14,3 +14,5 @@ test('get started link', async ({ page }) => {
   await home.clickGetStarted();
   await expect(home.installationHeading()).toBeVisible();
 });
+
+
