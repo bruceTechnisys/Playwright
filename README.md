@@ -38,6 +38,24 @@ npx playwright test --project=chromium --headed
 npx playwright show-report
 ```
 
+### Configuración de BASE_URL por entorno
+Este proyecto lee `BASE_URL` desde un archivo `.env` en la raíz (cargado con dotenv). Si no está definido, usa `https://playwright.dev/`.
+
+1) Crear `.env` con el valor de tu app
+```bash
+BASE_URL=https://mi-app.local/
+```
+
+2) Alternativa (Windows PowerShell) sin `.env`:
+```powershell
+$env:BASE_URL="https://mi-app.local/"; npm test
+```
+
+3) Alternativa (Unix) en una sola línea:
+```bash
+BASE_URL=https://mi-app.local/ npm test
+```
+
 ### Scripts de npm
 - test: ejecuta la suite en modo headless
 - test:headed: ejecuta tests con navegador visible
