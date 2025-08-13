@@ -86,6 +86,11 @@ tests/
 ### Metodología Page Object Model (POM)
 Los Page Objects encapsulan selectores y acciones, manteniendo los specs limpios y orientados a comportamiento.
 
+Buenas prácticas clave:
+- No realizar aserciones dentro del POM.
+- No pasar `expect` al POM.
+- Devolver locators o resultados y realizar las aserciones en el spec.
+
 Ejemplo de Page Object (fragmento de `pages/PlaywrightHomePage.ts`):
 ```ts
 import { expect, type Page } from '@playwright/test';
@@ -154,6 +159,7 @@ npx playwright show-trace path/a/trace.zip
 - Ubicar Page Objects en `pages/` con nombre `XxxPage.js`.
 - Mantener selectores dentro de los Page Objects; evitar usarlos directamente en los specs.
 - Nombrar métodos de Page Object como acciones o consultas (p. ej. `login`, `fillForm`, `profileName`).
+ - Hacer aserciones en los specs usando `expect`, no en el POM; el POM debe exponer locators o datos.
 
 ### Solución de problemas
 - Error TLS corporativo: `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`
