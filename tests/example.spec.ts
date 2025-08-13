@@ -5,7 +5,7 @@ import { PlaywrightHomePage } from '../pages/PlaywrightHomePage';
 test('has title', async ({ page }) => {
   const home = new PlaywrightHomePage(page);
   await home.goto();
-  await home.assertTitleContainsPlaywright();
+  await expect(page).toHaveTitle(/Playwright/);
 });
 
 test('get started link', async ({ page }) => {

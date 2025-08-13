@@ -1,5 +1,5 @@
 // @ts-check
-import { expect, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 export class PlaywrightHomePage {
 	private readonly page: Page;
@@ -12,9 +12,7 @@ export class PlaywrightHomePage {
 		await this.page.goto('/');
 	}
 
-	async assertTitleContainsPlaywright(): Promise<void> {
-		await expect(this.page).toHaveTitle(/Playwright/);
-	}
+
 
 	async clickGetStarted(): Promise<void> {
 		await this.page.getByRole('link', { name: 'Get started' }).click();
