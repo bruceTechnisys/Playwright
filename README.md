@@ -90,6 +90,7 @@ Buenas prácticas clave:
 - No realizar aserciones dentro del POM.
 - No pasar `expect` al POM.
 - Devolver locators o resultados y realizar las aserciones en el spec.
+- Definir locators una sola vez en el constructor y reutilizarlos.
 
 Ejemplo de Page Object (fragmento de `pages/PlaywrightHomePage.ts`):
 ```ts
@@ -160,6 +161,35 @@ npx playwright show-trace path/a/trace.zip
 - Mantener selectores dentro de los Page Objects; evitar usarlos directamente en los specs.
 - Nombrar métodos de Page Object como acciones o consultas (p. ej. `login`, `fillForm`, `profileName`).
  - Hacer aserciones en los specs usando `expect`, no en el POM; el POM debe exponer locators o datos.
+
+Ejemplo de patrón de locators en el constructor (TypeScript):
+```ts
+import { type Page, type Locator } from '@playwright/test';
+
+export class LoginPage {
+  private readonly page: Page;
+  readonly usernameInput: Locator;
+  readonly passwordInput: Locator;
+  readonly submitButton: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.usernameInput = page.getByLabel('Username');
+    this.passwordInput = page.getByLabel('Password');
+    this.submitButton = page.getByRole('button', { name: 'Sign in' });
+  }
+
+  async goto() {
+    await this.page.goto('/login');
+  }
+
+  async login(username: string, password: string) {
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+    await this.submitButton.click();
+  }
+}
+```
 
 ### Solución de problemas
 - Error TLS corporativo: `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`
