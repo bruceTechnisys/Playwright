@@ -38,6 +38,24 @@ npx playwright test --project=chromium --headed
 npx playwright show-report
 ```
 
+### Scripts de npm
+- test: ejecuta la suite en modo headless
+- test:headed: ejecuta tests con navegador visible
+- test:ui: abre el Test Runner UI
+- test:debug: ejecuta en modo depuración con el inspector
+- report:open / show-report: abre el reporte HTML más reciente
+- codegen: graba pasos y genera código apuntando a `https://playwright.dev/`
+
+Ejemplos:
+```bash
+npm test
+npm run test:headed
+npm run test:ui
+npm run test:debug
+npm run report:open
+npm run codegen
+```
+
 ### Estructura del proyecto
 ```
 playwright.config.js          # Configuración de Playwright (baseURL, proyectos/browsers, reporter)
