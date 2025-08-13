@@ -7,7 +7,11 @@
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
-    "show-report": "playwright show-report"
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "report:open": "playwright show-report",
+    "show-report": "playwright show-report",
+    "codegen": "playwright codegen https://playwright.dev/"
   },
   "repository": {
     "type": "git",
