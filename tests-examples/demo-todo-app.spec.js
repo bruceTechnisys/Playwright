@@ -408,6 +408,9 @@ test.describe('Routing', () => {
   });
 });
 
+/**
+ * @param {import('@playwright/test').Page} page
+ */
 async function createDefaultTodos(page) {
   // create a new todo locator
   const newTodo = page.getByPlaceholder('What needs to be done?');
@@ -434,7 +437,9 @@ async function createDefaultTodos(page) {
  */
  async function checkNumberOfCompletedTodosInLocalStorage(page, expected) {
   return await page.waitForFunction(e => {
-    return JSON.parse(localStorage['react-todos']).filter(i => i.completed).length === e;
+    /** @type {{completed: boolean}[]} */
+    const items = JSON.parse(localStorage['react-todos']);
+    return items.filter((i) => i.completed).length === e;
   }, expected);
 }
 
@@ -444,6 +449,8 @@ async function createDefaultTodos(page) {
  */
 async function checkTodosInLocalStorage(page, title) {
   return await page.waitForFunction(t => {
-    return JSON.parse(localStorage['react-todos']).map(i => i.title).includes(t);
+    /** @type {{title: string}[]} */
+    const items = JSON.parse(localStorage['react-todos']);
+    return items.map((i) => i.title).includes(t);
   }, title);
 }

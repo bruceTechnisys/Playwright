@@ -2,8 +2,18 @@
   "name": "playwright",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "report:open": "playwright show-report",
+    "show-report": "playwright show-report",
+    "codegen": "playwright codegen https://playwright.dev/",
+    "typecheck": "tsc -p tsconfig.json"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bruceTechnisys/Playwright.git"
@@ -17,6 +27,8 @@
   "homepage": "https://github.com/bruceTechnisys/Playwright#readme",
   "devDependencies": {
     "@playwright/test": "^1.54.2",
-    "@types/node": "^24.2.1"
+    "@types/node": "^24.2.1",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.5.4"
   }
 }
