@@ -86,6 +86,12 @@ tests/
 ### Metodología Page Object Model (POM)
 Los Page Objects encapsulan selectores y acciones, manteniendo los specs limpios y orientados a comportamiento.
 
+Buenas prácticas clave:
+- No realizar aserciones dentro del POM.
+- No pasar `expect` al POM.
+- Devolver locators o resultados y realizar las aserciones en el spec.
+- Definir locators una sola vez en el constructor y reutilizarlos.
+
 Ejemplo de Page Object (fragmento de `pages/PlaywrightHomePage.ts`):
 ```ts
 import { expect, type Page } from '@playwright/test';
@@ -150,10 +156,57 @@ npx playwright show-report
 npx playwright show-trace path/a/trace.zip
 ```
 
+### Etiquetas y filtrado (grep)
+- Etiqueta tests en el título con `@smoke`, `@regression`, etc.: por ejemplo `test('login @smoke', ...)` o `test.describe('Checkout @regression', ...)`.
+- Ejecuta subconjuntos con `--grep`:
+```bash
+# Solo smoke
+npm test -- --grep=@smoke
+
+# Solo regression
+npm test -- --grep=@regression
+
+# Excluir regression (invertir filtro)
+npm test -- --grep=@regression --grep-invert
+
+# Combinar (regex): smoke o critical
+npm test -- --grep="@smoke|@critical"
+```
+
 ### Convenciones recomendadas
 - Ubicar Page Objects en `pages/` con nombre `XxxPage.js`.
 - Mantener selectores dentro de los Page Objects; evitar usarlos directamente en los specs.
 - Nombrar métodos de Page Object como acciones o consultas (p. ej. `login`, `fillForm`, `profileName`).
+ - Hacer aserciones en los specs usando `expect`, no en el POM; el POM debe exponer locators o datos.
+
+Ejemplo de patrón de locators en el constructor (TypeScript):
+```ts
+import { type Page, type Locator } from '@playwright/test';
+
+export class LoginPage {
+  private readonly page: Page;
+  readonly usernameInput: Locator;
+  readonly passwordInput: Locator;
+  readonly submitButton: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.usernameInput = page.getByLabel('Username');
+    this.passwordInput = page.getByLabel('Password');
+    this.submitButton = page.getByRole('button', { name: 'Sign in' });
+  }
+
+  async goto() {
+    await this.page.goto('/login');
+  }
+
+  async login(username: string, password: string) {
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+    await this.submitButton.click();
+  }
+}
+```
 
 ### Solución de problemas
 - Error TLS corporativo: `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`

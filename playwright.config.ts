@@ -10,11 +10,17 @@ const BASE_URL = process.env.BASE_URL || 'https://playwright.dev/';
 
 export default defineConfig({
   testDir: './tests',
+  // Timeout global por test (ms)
+  timeout: 60000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
+  expect: {
+    // Timeout por defecto para aserciones expect (ms)
+    timeout: 10000,
+  },
   use: {
     baseURL: BASE_URL,
     screenshot: 'only-on-failure',
