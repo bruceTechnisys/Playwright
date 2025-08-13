@@ -17,7 +17,9 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: BASE_URL,
-    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
