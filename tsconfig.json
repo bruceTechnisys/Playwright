@@ -18,6 +18,7 @@
     "tests/**/*.js",
     "tests/**/*.ts",
     "tests-examples/**/*.js",
+    "utils/**/*.ts",
     "playwright.config.js",
     "playwright.config.ts"
   ]
