@@ -1,7 +1,7 @@
 ## Playwright E2E Tests (Page Object Model)
 
 ### Descripción
-Proyecto base de pruebas end‑to‑end con Playwright utilizando la metodología Page Object Model (POM). Incluye ejemplos sobre `https://playwright.dev/`, un `baseURL` preconfigurado y pruebas que demuestran navegación y aserciones básicas.
+Proyecto completo de pruebas end‑to‑end con Playwright utilizando la metodología Page Object Model (POM). Incluye una suite comprensiva de tests para `https://playwright.dev/` con cobertura de funcionalidad, performance, accesibilidad y diseño responsivo.
 
 ### Requisitos
 - Node.js 18 o superior (recomendado LTS)
@@ -78,9 +78,19 @@ npm run codegen
 ```
 playwright.config.ts          # Configuración de Playwright (baseURL, proyectos/browsers, reporter)
 pages/
-  PlaywrightHomePage.ts       # Page Object de la home de playwright.dev
+  PlaywrightHomePage.ts       # Page Object extendido de la home de playwright.dev
 tests/
-  example.spec.ts             # Pruebas que usan el Page Object
+  example.spec.ts             # Pruebas básicas de ejemplo
+  home-more.spec.ts           # Pruebas adicionales de navegación
+  content-validation.spec.ts  # Validación de contenido principal (@smoke)
+  navigation.spec.ts          # Tests de navegación y links (@regression)
+  responsive.spec.ts          # Tests de diseño responsivo (@regression) 
+  performance.spec.ts         # Tests de performance y carga (@performance)
+  search.spec.ts              # Tests de funcionalidad de búsqueda (@regression)
+  accessibility.spec.ts       # Tests de accesibilidad (@a11y)
+  companies-section.spec.ts   # Tests de sección de empresas (@smoke)
+utils/
+  todo-helpers.ts             # Utilidades adicionales
 ```
 
 ### Metodología Page Object Model (POM)
@@ -94,23 +104,38 @@ Buenas prácticas clave:
 
 Ejemplo de Page Object (fragmento de `pages/PlaywrightHomePage.ts`):
 ```ts
-import { expect, type Page } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 
 export class PlaywrightHomePage {
-  constructor(private readonly page: Page) {}
+  private readonly page: Page;
+  private readonly getStartedLink: Locator;
+  private readonly heroHeading: Locator;
+  private readonly companiesSection: Locator;
+  // ... más locators
 
-  async goto() {
+  constructor(page: Page) {
+    this.page = page;
+    // Define locators una vez y reutilízalos
+    this.getStartedLink = this.page.getByRole('link', { name: 'Get started' });
+    this.heroHeading = this.page.getByRole('heading', { name: /Playwright enables/ });
+    this.companiesSection = this.page.locator('text=Chosen by companies');
+  }
+
+  async goto(): Promise<void> {
     await this.page.goto('/');
   }
 
-  async assertTitleContainsPlaywright() {
-    await expect(this.page).toHaveTitle(/Playwright/);
+  async clickGetStarted(): Promise<void> {
+    await this.getStartedLink.click();
   }
 
-  async clickGetStarted() {
-    await this.page.getByRole('link', { name: 'Get started' }).click();
+  async scrollToCompanies(): Promise<void> {
+    await this.companiesSection.scrollIntoViewIfNeeded();
   }
 
+  // Exponer locators para aserciones en tests
+  heroSection() { return this.heroHeading; }
+  companies() { return this.companiesSection; }
   installationHeading() {
     return this.page.getByRole('heading', { name: 'Installation' });
   }
@@ -156,6 +181,63 @@ npx playwright show-report
 npx playwright show-trace path/a/trace.zip
 ```
 
+### Suite de Tests Implementada
+
+#### Tests por Categoría (49 tests totales)
+
+**Tests de Smoke (@smoke) - 13 tests**
+- Verificación de elementos críticos y contenido principal
+- Ejecución rápida para validación básica
+```bash
+npx playwright test --grep @smoke
+```
+
+**Tests de Regresión (@regression) - 28 tests**
+- Navegación, links, responsive design, búsqueda
+- Cobertura completa de funcionalidades
+```bash
+npx playwright test --grep @regression
+```
+
+**Tests de Performance (@performance) - 7 tests**
+- Tiempos de carga, imágenes, navegación, recursos
+- Validación de umbrales de performance
+```bash
+npx playwright test --grep @performance
+```
+
+**Tests de Accesibilidad (@a11y) - 8 tests**
+- Headings, ARIA, navegación por teclado, contraste
+- Cumplimiento de estándares de accesibilidad
+```bash
+npx playwright test --grep @a11y
+```
+
+#### Archivos de Test Específicos
+
+```bash
+# Tests de contenido principal
+npx playwright test tests/content-validation.spec.ts
+
+# Tests de navegación y links
+npx playwright test tests/navigation.spec.ts
+
+# Tests responsive (móvil, tablet, desktop)
+npx playwright test tests/responsive.spec.ts
+
+# Tests de performance y carga
+npx playwright test tests/performance.spec.ts
+
+# Tests de funcionalidad de búsqueda
+npx playwright test tests/search.spec.ts
+
+# Tests de accesibilidad
+npx playwright test tests/accessibility.spec.ts
+
+# Tests de sección de empresas
+npx playwright test tests/companies-section.spec.ts
+```
+
 ### Etiquetas y filtrado (grep)
 - Etiqueta tests en el título con `@smoke`, `@regression`, etc.: por ejemplo `test('login @smoke', ...)` o `test.describe('Checkout @regression', ...)`.
 - Ejecuta subconjuntos con `--grep`:
@@ -166,18 +248,31 @@ npm test -- --grep=@smoke
 # Solo regression
 npm test -- --grep=@regression
 
+# Solo performance
+npm test -- --grep=@performance
+
+# Solo accesibilidad
+npm test -- --grep=@a11y
+
 # Excluir regression (invertir filtro)
 npm test -- --grep=@regression --grep-invert
 
 # Combinar (regex): smoke o critical
 npm test -- --grep="@smoke|@critical"
+
+# Ejecutar en navegador específico
+npx playwright test --grep @smoke --project=chromium
 ```
 
 ### Convenciones recomendadas
-- Ubicar Page Objects en `pages/` con nombre `XxxPage.js`.
+- Ubicar Page Objects en `pages/` con nombre `XxxPage.ts`.
 - Mantener selectores dentro de los Page Objects; evitar usarlos directamente en los specs.
 - Nombrar métodos de Page Object como acciones o consultas (p. ej. `login`, `fillForm`, `profileName`).
- - Hacer aserciones en los specs usando `expect`, no en el POM; el POM debe exponer locators o datos.
+- Hacer aserciones en los specs usando `expect`, no en el POM; el POM debe exponer locators o datos.
+- Usar tags apropiados: `@smoke` para críticos, `@regression` para completos, `@performance` para rendimiento, `@a11y` para accesibilidad.
+- Implementar manejo de errores gracioso - los tests deben fallar con información útil.
+- Probar en múltiples viewports para garantizar diseño responsivo.
+- Incluir timeouts razonables en tests de performance (conservadores para evitar flakiness).
 
 Ejemplo de patrón de locators en el constructor (TypeScript):
 ```ts
@@ -222,10 +317,39 @@ export class LoginPage {
   setx NO_PROXY    "localhost,127.0.0.1"
   ```
 
+### Características Avanzadas de la Suite
+
+#### Tests de Performance
+- Monitoreo de tiempos de carga (< 10s página completa, < 8s elementos críticos)
+- Validación de imágenes y recursos
+- Medición de respuesta de navegación e interacciones
+- Auditoría de requests HTTP
+
+#### Tests de Accesibilidad
+- Estructura semántica de headings (H1, H2, H3)
+- Validación de alt text en imágenes
+- Navegación por teclado funcional
+- ARIA landmarks y roles
+- Contraste y legibilidad
+
+#### Tests Responsivos
+- Viewports: Desktop (1920x1080), Laptop (1024x768), Tablet (768x1024), Mobile (375x667)
+- Navegación móvil y menús hamburguesa
+- Adaptación de contenido por pantalla
+- Layout fluido y elementos accesibles
+
+#### Manejo de Errores Robusto
+- Tests que fallan graciosamente cuando elementos no existen
+- Logging informativo para debugging
+- Verificaciones condicionales para funcionalidades opcionales
+- Timeouts apropiados y esperas inteligentes
+
 ### Extender el proyecto
-1) Crea un nuevo Page Object en `pages/` (por ejemplo, `LoginPage.js`).
+1) Crea un nuevo Page Object en `pages/` (por ejemplo, `LoginPage.ts`).
 2) Añade métodos que representen acciones/consultas de la página.
 3) Úsalo desde tus specs en `tests/`.
+4) Usa los tags apropiados (@smoke, @regression, @performance, @a11y).
+5) Sigue las convenciones de naming y estructura establecidas.
 
 ### Licencia
 ISC
