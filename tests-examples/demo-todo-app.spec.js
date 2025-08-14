@@ -1,15 +1,16 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
+import { 
+  TODO_ITEMS, 
+  createDefaultTodos, 
+  checkNumberOfTodosInLocalStorage, 
+  checkNumberOfCompletedTodosInLocalStorage, 
+  checkTodosInLocalStorage 
+} from '../utils/todo-helpers.js';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('https://demo.playwright.dev/todomvc');
 });
-
-const TODO_ITEMS = [
-  'buy some cheese',
-  'feed the cat',
-  'book a doctors appointment'
-];
 
 test.describe('New Todo', () => {
   test('should allow me to add todo items', async ({ page }) => {
@@ -408,49 +409,4 @@ test.describe('Routing', () => {
   });
 });
 
-/**
- * @param {import('@playwright/test').Page} page
- */
-async function createDefaultTodos(page) {
-  // create a new todo locator
-  const newTodo = page.getByPlaceholder('What needs to be done?');
 
-  for (const item of TODO_ITEMS) {
-    await newTodo.fill(item);
-    await newTodo.press('Enter');
-  }
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {number} expected
- */
- async function checkNumberOfTodosInLocalStorage(page, expected) {
-  return await page.waitForFunction(e => {
-    return JSON.parse(localStorage['react-todos']).length === e;
-  }, expected);
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {number} expected
- */
- async function checkNumberOfCompletedTodosInLocalStorage(page, expected) {
-  return await page.waitForFunction(e => {
-    /** @type {{completed: boolean}[]} */
-    const items = JSON.parse(localStorage['react-todos']);
-    return items.filter((i) => i.completed).length === e;
-  }, expected);
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} title
- */
-async function checkTodosInLocalStorage(page, title) {
-  return await page.waitForFunction(t => {
-    /** @type {{title: string}[]} */
-    const items = JSON.parse(localStorage['react-todos']);
-    return items.map((i) => i.title).includes(t);
-  }, title);
-}
